@@ -121,6 +121,7 @@ type Cmd
     | Rotate270
     | InvertColors
     | Save
+    | SetTransparency
     | NoCmd
 
 
@@ -169,6 +170,7 @@ allCmds =
     , Rotate270
     , InvertColors
     , Save
+    , SetTransparency
     , NoCmd
     ]
 
@@ -238,6 +240,7 @@ defaultConfig =
     , ( Down, CharF, CmdKeyIsUp, ShiftIsDown ) := Rotate180
     , ( Down, CharE, CmdKeyIsUp, ShiftIsDown ) := Rotate270
     , ( Down, CharI, CmdKeyIsUp, ShiftIsDown ) := InvertColors
+    , ( Down, Space, CmdKeyIsUp, ShiftIsUp ) := SetTransparency
     ]
 
 
