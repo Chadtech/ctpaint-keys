@@ -122,6 +122,7 @@ type Cmd
     | InvertColors
     | Save
     | SetTransparency
+    | Upload
     | NoCmd
 
 
@@ -241,6 +242,7 @@ defaultConfig =
     , ( Down, CharE, CmdKeyIsUp, ShiftIsDown ) := Rotate270
     , ( Down, CharI, CmdKeyIsUp, ShiftIsDown ) := InvertColors
     , ( Down, Space, CmdKeyIsUp, ShiftIsUp ) := SetTransparency
+    , ( Down, CharO, CmdKeyIsDown, ShiftIsUp ) := Upload
     ]
 
 
