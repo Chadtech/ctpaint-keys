@@ -588,9 +588,6 @@ toCmd str =
         "init-text" ->
             Decode.succeed InitText
 
-        "init-imgur" ->
-            Decode.succeed InitImgur
-
         "init-replace-color" ->
             Decode.succeed InitReplaceColor
 
