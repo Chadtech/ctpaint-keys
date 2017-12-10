@@ -108,7 +108,6 @@ type Cmd
     | InitImport
     | InitScale
     | InitText
-    | InitImgur
     | InitReplaceColor
     | ToggleColorPicker
     | SwitchGalleryView
@@ -159,7 +158,6 @@ allCmds =
     , InitImport
     , InitScale
     , InitText
-    , InitImgur
     , InitReplaceColor
     , ToggleColorPicker
     , SwitchGalleryView
