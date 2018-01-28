@@ -51,7 +51,7 @@ import Json.Decode.Pipeline
         )
 import Json.Encode as Encode exposing (Value)
 import Keyboard exposing (KeyCode)
-import Keyboard.Extra exposing (Key(..))
+import Keyboard.Extra.Browser exposing (Browser, Key(..))
 import String.Extra
 import Tuple.Infix exposing ((:=))
 
@@ -252,23 +252,23 @@ defaultConfig =
 
 {-| The dictionary used to map key events to cmds
 -}
-initCmdLookUp : Config -> Dict String Cmd
-initCmdLookUp =
-    List.map (Tuple.mapFirst quickKeyToString)
+initCmdLookUp : Browser -> Config -> Dict String Cmd
+initCmdLookUp browser =
+    List.map (Tuple.mapFirst (quickKeyToString browser))
         >> Dict.fromList
 
 
 {-| The dictionary used to map cmds to key arrangements (Undo -> "cmd + z")
 -}
-initQuickKeysLookUp : Config -> Bool -> Dict String String
-initQuickKeysLookUp config isMac =
+initQuickKeysLookUp : Browser -> Config -> Bool -> Dict String String
+initQuickKeysLookUp browser config isMac =
     config
-        |> List.map (quickKeyLookUp isMac)
+        |> List.map (quickKeyLookUp browser isMac)
         |> Dict.fromList
 
 
-quickKeyLookUp : Bool -> ( QuickKey, Cmd ) -> ( String, String )
-quickKeyLookUp isMac ( ( _, key, cmdKey, shift ), command ) =
+quickKeyLookUp : Browser -> Bool -> ( QuickKey, Cmd ) -> ( String, String )
+quickKeyLookUp browser isMac ( ( _, key, cmdKey, shift ), command ) =
     let
         commandStr =
             toString command
@@ -292,17 +292,18 @@ quickKeyLookUp isMac ( ( _, key, cmdKey, shift ), command ) =
 
         keyStr =
             key
-                |> Keyboard.Extra.toCode
-                |> keyCodeToString
+                |> Keyboard.Extra.Browser.toCode browser
+                |> keyCodeToString browser
     in
     ( commandStr, cmdKeyStr ++ shiftStr ++ keyStr )
 
 
-quickKeyToString : QuickKey -> String
-quickKeyToString ( direction, key, cmd, shift ) =
+quickKeyToString : Browser -> QuickKey -> String
+quickKeyToString browser ( direction, key, cmd, shift ) =
     let
         code =
-            Keyboard.Extra.toCode key
+            key
+                |> Keyboard.Extra.Browser.toCode browser
                 |> toString
 
         cmdStr =
@@ -318,9 +319,9 @@ quickKeyToString ( direction, key, cmd, shift ) =
     shiftStr ++ cmdStr ++ code ++ toString direction
 
 
-keyCodeToString : KeyCode -> String
-keyCodeToString key =
-    case Keyboard.Extra.fromCode key of
+keyCodeToString : Browser -> KeyCode -> String
+keyCodeToString browser key =
+    case Keyboard.Extra.Browser.fromCode browser key of
         Control ->
             "Ctrl"
 
@@ -379,32 +380,32 @@ keyCodeToString key =
 
 {-| Turn the config into json
 -}
-encodeConfig : Config -> Value
-encodeConfig =
-    List.map encodeCmdPair >> Encode.list
+encodeConfig : Browser -> Config -> Value
+encodeConfig browser =
+    List.map (encodeCmdPair browser) >> Encode.list
 
 
-encodeCmdPair : ( QuickKey, Cmd ) -> Value
-encodeCmdPair ( quickKey, cmd ) =
-    [ "quick-key" := encodeQuickKey quickKey
+encodeCmdPair : Browser -> ( QuickKey, Cmd ) -> Value
+encodeCmdPair browser ( quickKey, cmd ) =
+    [ "quick-key" := encodeQuickKey browser quickKey
     , "cmd" := simpleEncode cmd
     ]
         |> Encode.object
 
 
-encodeQuickKey : QuickKey -> Value
-encodeQuickKey ( direction, key, cmdKeyState, shiftState ) =
+encodeQuickKey : Browser -> QuickKey -> Value
+encodeQuickKey browser ( direction, key, cmdKeyState, shiftState ) =
     [ "direction" := simpleEncode direction
-    , "key" := encodeKey key
+    , "key" := encodeKey browser key
     , "cmd-key-state" := encodeCmdKeyState cmdKeyState
     , "shift-state" := encodeShiftState shiftState
     ]
         |> Encode.object
 
 
-encodeKey : Key -> Value
-encodeKey =
-    Keyboard.Extra.toCode >> Encode.int
+encodeKey : Browser -> Key -> Value
+encodeKey browser =
+    Keyboard.Extra.Browser.toCode browser >> Encode.int
 
 
 encodeCmdKeyState : CmdKeyState -> Value
@@ -474,23 +475,23 @@ toDirection str =
 
 {-| Turn json into a key config using the config decoder
 -}
-configDecoder : Decoder Config
+configDecoder : Browser -> Decoder Config
 configDecoder =
-    Decode.list cmdPairDecoder
+    Decode.list << cmdPairDecoder
 
 
-cmdPairDecoder : Decoder ( QuickKey, Cmd )
-cmdPairDecoder =
+cmdPairDecoder : Browser -> Decoder ( QuickKey, Cmd )
+cmdPairDecoder browser =
     decode (,)
-        |> required "quick-key" quickKeyDecoder
+        |> required "quick-key" (quickKeyDecoder browser)
         |> required "cmd" cmdDecoder
 
 
-quickKeyDecoder : Decoder QuickKey
-quickKeyDecoder =
+quickKeyDecoder : Browser -> Decoder QuickKey
+quickKeyDecoder browser =
     decode (,,,)
         |> required "direction" directionDecoder
-        |> required "key" keyDecoder
+        |> required "key" (keyDecoder browser)
         |> required "cmd-key-state" cmdKeyStateDecoder
         |> required "shift-state" shiftStateDecoder
 
@@ -658,6 +659,8 @@ toCmdKeyState direction =
             CmdKeyIsDown
 
 
-keyDecoder : Decoder Key
-keyDecoder =
-    Decode.map Keyboard.Extra.fromCode Decode.int
+keyDecoder : Browser -> Decoder Key
+keyDecoder browser =
+    Decode.map
+        (Keyboard.Extra.Browser.fromCode browser)
+        Decode.int
