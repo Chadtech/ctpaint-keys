@@ -92,6 +92,7 @@ type Cmd
     | SetToolToHand
     | SetToolToSelect
     | SetToolToFill
+    | SetToolToEraser
     | SetToolToSample
     | SetToolToLine
     | SetToolToRectangle
@@ -213,6 +214,7 @@ defaultConfig =
     , ( Down, CharH, CmdKeyIsUp, ShiftIsUp ) := SetToolToHand
     , ( Down, CharS, CmdKeyIsUp, ShiftIsUp ) := SetToolToSelect
     , ( Down, CharG, CmdKeyIsUp, ShiftIsUp ) := SetToolToFill
+    , ( Down, CharE, CmdKeyIsUp, ShiftIsUp ) := SetToolToEraser
     , ( Down, CharI, CmdKeyIsUp, ShiftIsUp ) := SetToolToSample
     , ( Down, CharL, CmdKeyIsUp, ShiftIsUp ) := SetToolToLine
     , ( Down, CharU, CmdKeyIsUp, ShiftIsUp ) := SetToolToRectangle
@@ -233,7 +235,7 @@ defaultConfig =
     , ( Down, CharR, CmdKeyIsUp, ShiftIsUp ) := InitReplaceColor
     , ( Down, Tab, CmdKeyIsUp, ShiftIsUp ) := SwitchGalleryView
     , ( Down, BackSpace, CmdKeyIsUp, ShiftIsUp ) := Delete
-    , ( Down, CharE, CmdKeyIsUp, ShiftIsUp ) := ToggleColorPicker
+    , ( Down, CharE, CmdKeyIsDown, ShiftIsDown ) := ToggleColorPicker
     , ( Down, CharH, CmdKeyIsUp, ShiftIsDown ) := FlipHorizontal
     , ( Down, CharV, CmdKeyIsUp, ShiftIsDown ) := FlipVertical
     , ( Down, CharR, CmdKeyIsUp, ShiftIsDown ) := Rotate90
