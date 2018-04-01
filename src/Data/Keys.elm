@@ -597,6 +597,9 @@ toCmd str =
         "init-resize" ->
             Decode.succeed InitResize
 
+        "init-upload" ->
+            Decode.succeed InitUpload
+
         "toggle-color-picker" ->
             Decode.succeed ToggleColorPicker
 
