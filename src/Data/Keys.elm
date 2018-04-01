@@ -124,6 +124,7 @@ type Cmd
     | SetTransparency
     | InitUpload
     | InitResize
+      -- WHEN ADDING A CMD, add it to defaultConfig, allCmds, and the Cmd type
     | NoCmd
 
 
@@ -177,6 +178,7 @@ allCmds =
     , InitResize
 
     -- Includes every constructor except NoCmd
+    -- WHEN ADDING A CMD, add it to defaultConfig, allCmds, and the Cmd type
     ]
 
 
@@ -249,6 +251,8 @@ defaultConfig =
     , ( Down, Space, CmdKeyIsUp, ShiftIsUp ) := SetTransparency
     , ( Down, CharO, CmdKeyIsDown, ShiftIsUp ) := InitUpload
     , ( Down, CharR, CmdKeyIsDown, ShiftIsDown ) := InitResize
+
+    -- WHEN ADDING A CMD, add it to defaultConfig, allCmds, and the Cmd type
     ]
 
 
@@ -519,7 +523,7 @@ toString cmd =
             "revert-quick-turn-right"
 
         SwatchesQuickTurnDown ->
-            "revert-quick-turn-down"
+            "swatches-quick-turn-down"
 
         RevertQuickTurnDown ->
             "revert-quick-turn-down"
