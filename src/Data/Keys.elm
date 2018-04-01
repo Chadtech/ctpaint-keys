@@ -175,6 +175,8 @@ allCmds =
     , SetTransparency
     , InitUpload
     , InitResize
+
+    -- Includes every constructor except NoCmd
     ]
 
 
@@ -275,7 +277,7 @@ quickKeyLookUp : Browser -> Bool -> ( QuickKey, Cmd ) -> ( String, String )
 quickKeyLookUp browser isMac ( ( _, key, cmdKey, shift ), command ) =
     let
         commandStr =
-            toString command
+            Basics.toString command
 
         cmdKeyStr =
             case ( cmdKey, isMac ) of
@@ -304,10 +306,10 @@ quickKeyLookUp browser isMac ( ( _, key, cmdKey, shift ), command ) =
 
 quickKeyToString : Browser -> QuickKey -> String
 quickKeyToString browser ( direction, key, cmd, shift ) =
-    [ shift == ShiftIsDown |> toString
-    , cmd == CmdKeyIsDown |> toString
-    , Keyboard.Extra.Browser.toCode browser key |> toString
-    , toString direction
+    [ shift == ShiftIsDown |> Basics.toString
+    , cmd == CmdKeyIsDown |> Basics.toString
+    , Keyboard.Extra.Browser.toCode browser key |> Basics.toString
+    , Basics.toString direction
     ]
         |> String.concat
 
@@ -348,7 +350,7 @@ keyCodeToString browser key =
         other ->
             let
                 otherAsStr =
-                    toString other
+                    Basics.toString other
 
                 isChar =
                     String.left 4 otherAsStr == "Char"
@@ -423,7 +425,7 @@ encodeShiftState shiftState =
 
 simpleEncode : a -> Value
 simpleEncode =
-    toString >> dasherize >> Encode.string
+    Basics.toString >> dasherize >> Encode.string
 
 
 dasherize : String -> String
@@ -546,6 +548,12 @@ toString cmd =
         SetToolToRectangleFilled ->
             "set-tool-to-rectangle-filled"
 
+        SetToolToEraser ->
+            "set-tool-to-eraser"
+
+        SetTransparency ->
+            "set-transparency"
+
         Undo ->
             "undo"
 
@@ -624,10 +632,13 @@ toString cmd =
         Save ->
             "save"
 
+        NoCmd ->
+            "NO__COMMAND"
+
 
 keyDict : Dict String Cmd
 keyDict =
-    List.map2 (,) (List.map toString allCmds) allCmds
+    List.map2 (,) (List.map Basics.toString allCmds) allCmds
         |> Dict.fromList
 
 
