@@ -638,14 +638,13 @@ toString cmd =
 
 keyDict : Dict String Cmd
 keyDict =
-    List.map2 (,) (List.map Basics.toString allCmds) allCmds
+    List.map2 (,) (List.map toString allCmds) allCmds
         |> Dict.fromList
-        |> Debug.log "Key Dict"
 
 
 toCmd : String -> Decoder Cmd
 toCmd str =
-    case Dict.get (Debug.log "Str" str) keyDict of
+    case Dict.get str keyDict of
         Just cmd ->
             Decode.succeed cmd
 
