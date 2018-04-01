@@ -143,6 +143,7 @@ allCmds =
     , SetToolToHand
     , SetToolToSelect
     , SetToolToFill
+    , SetToolToEraser
     , SetToolToSample
     , SetToolToLine
     , SetToolToRectangle
@@ -172,7 +173,8 @@ allCmds =
     , InvertColors
     , Save
     , SetTransparency
-    , NoCmd
+    , InitUpload
+    , InitResize
     ]
 
 
@@ -302,23 +304,12 @@ quickKeyLookUp browser isMac ( ( _, key, cmdKey, shift ), command ) =
 
 quickKeyToString : Browser -> QuickKey -> String
 quickKeyToString browser ( direction, key, cmd, shift ) =
-    let
-        code =
-            key
-                |> Keyboard.Extra.Browser.toCode browser
-                |> toString
-
-        cmdStr =
-            cmd
-                == CmdKeyIsDown
-                |> toString
-
-        shiftStr =
-            shift
-                == ShiftIsDown
-                |> toString
-    in
-    shiftStr ++ cmdStr ++ code ++ toString direction
+    [ shift == ShiftIsDown |> toString
+    , cmd == CmdKeyIsDown |> toString
+    , Keyboard.Extra.Browser.toCode browser key |> toString
+    , toString direction
+    ]
+        |> String.concat
 
 
 keyCodeToString : Browser -> KeyCode -> String
@@ -504,136 +495,149 @@ cmdDecoder =
         |> Decode.andThen toCmd
 
 
+toString : Cmd -> String
+toString cmd =
+    case cmd of
+        SwatchesTurnLeft ->
+            "swatches-turn-left"
+
+        SwatchesTurnRight ->
+            "swatches-turn-right"
+
+        SwatchesQuickTurnLeft ->
+            "swatches-quick-turn-left"
+
+        RevertQuickTurnLeft ->
+            "revert-quick-turn-left"
+
+        SwatchesQuickTurnRight ->
+            "swatches-quick-turn-right"
+
+        RevertQuickTurnRight ->
+            "revert-quick-turn-right"
+
+        SwatchesQuickTurnDown ->
+            "revert-quick-turn-down"
+
+        RevertQuickTurnDown ->
+            "revert-quick-turn-down"
+
+        SetToolToPencil ->
+            "set-tool-to-pencil"
+
+        SetToolToHand ->
+            "set-tool-to-hand"
+
+        SetToolToSelect ->
+            "set-tool-to-select"
+
+        SetToolToFill ->
+            "set-tool-to-fill"
+
+        SetToolToSample ->
+            "set-tool-to-sample"
+
+        SetToolToLine ->
+            "set-tool-to-line"
+
+        SetToolToRectangle ->
+            "set-tool-to-rectangle"
+
+        SetToolToRectangleFilled ->
+            "set-tool-to-rectangle-filled"
+
+        Undo ->
+            "undo"
+
+        Redo ->
+            "redo"
+
+        Cut ->
+            "cut"
+
+        Copy ->
+            "copy"
+
+        SelectAll ->
+            "select-all"
+
+        Paste ->
+            "paste"
+
+        ZoomIn ->
+            "zoom-in"
+
+        ZoomOut ->
+            "zoom-out"
+
+        InitDownload ->
+            "init-download"
+
+        InitImport ->
+            "init-import"
+
+        InitScale ->
+            "init-scale"
+
+        InitText ->
+            "init-text"
+
+        InitReplaceColor ->
+            "init-replace-color"
+
+        InitResize ->
+            "init-resize"
+
+        InitUpload ->
+            "init-upload"
+
+        ToggleColorPicker ->
+            "toggle-color-picker"
+
+        SwitchGalleryView ->
+            "switch-gallery-view"
+
+        ToggleMinimap ->
+            "toggle-minimap"
+
+        Delete ->
+            "delete"
+
+        FlipHorizontal ->
+            "flip-horizontal"
+
+        FlipVertical ->
+            "flip-vertical"
+
+        Rotate90 ->
+            "rotate90"
+
+        Rotate180 ->
+            "rotate180"
+
+        Rotate270 ->
+            "rotate270"
+
+        InvertColors ->
+            "invert-colors"
+
+        Save ->
+            "save"
+
+
+keyDict : Dict String Cmd
+keyDict =
+    List.map2 (,) (List.map toString allCmds) allCmds
+        |> Dict.fromList
+
+
 toCmd : String -> Decoder Cmd
 toCmd str =
-    case str of
-        "swatches-turn-left" ->
-            Decode.succeed SwatchesTurnLeft
+    case Dict.get str keyDict of
+        Just cmd ->
+            Decode.succeed cmd
 
-        "swatches-turn-right" ->
-            Decode.succeed SwatchesTurnRight
-
-        "swatches-quick-turn-left" ->
-            Decode.succeed SwatchesQuickTurnLeft
-
-        "revert-quick-turn-left" ->
-            Decode.succeed RevertQuickTurnLeft
-
-        "swatches-quick-turn-right" ->
-            Decode.succeed SwatchesQuickTurnRight
-
-        "revert-quick-turn-right" ->
-            Decode.succeed RevertQuickTurnRight
-
-        "swatches-quick-turn-down" ->
-            Decode.succeed SwatchesQuickTurnDown
-
-        "revert-quick-turn-down" ->
-            Decode.succeed RevertQuickTurnDown
-
-        "set-tool-to-pencil" ->
-            Decode.succeed SetToolToPencil
-
-        "set-tool-to-hand" ->
-            Decode.succeed SetToolToHand
-
-        "set-tool-to-select" ->
-            Decode.succeed SetToolToSelect
-
-        "set-tool-to-fill" ->
-            Decode.succeed SetToolToFill
-
-        "set-tool-to-sample" ->
-            Decode.succeed SetToolToSample
-
-        "set-tool-to-line" ->
-            Decode.succeed SetToolToLine
-
-        "set-tool-to-rectangle" ->
-            Decode.succeed SetToolToRectangle
-
-        "set-tool-to-rectangle-filled" ->
-            Decode.succeed SetToolToRectangleFilled
-
-        "undo" ->
-            Decode.succeed Undo
-
-        "redo" ->
-            Decode.succeed Redo
-
-        "cut" ->
-            Decode.succeed Cut
-
-        "copy" ->
-            Decode.succeed Copy
-
-        "select-all" ->
-            Decode.succeed SelectAll
-
-        "paste" ->
-            Decode.succeed Paste
-
-        "zoom-in" ->
-            Decode.succeed ZoomIn
-
-        "zoom-out" ->
-            Decode.succeed ZoomOut
-
-        "init-download" ->
-            Decode.succeed InitDownload
-
-        "init-import" ->
-            Decode.succeed InitImport
-
-        "init-scale" ->
-            Decode.succeed InitScale
-
-        "init-text" ->
-            Decode.succeed InitText
-
-        "init-replace-color" ->
-            Decode.succeed InitReplaceColor
-
-        "init-resize" ->
-            Decode.succeed InitResize
-
-        "init-upload" ->
-            Decode.succeed InitUpload
-
-        "toggle-color-picker" ->
-            Decode.succeed ToggleColorPicker
-
-        "switch-gallery-view" ->
-            Decode.succeed SwitchGalleryView
-
-        "toggle-minimap" ->
-            Decode.succeed ToggleMinimap
-
-        "delete" ->
-            Decode.succeed Delete
-
-        "flip-horizontal" ->
-            Decode.succeed FlipHorizontal
-
-        "flip-vertical" ->
-            Decode.succeed FlipVertical
-
-        "rotate90" ->
-            Decode.succeed Rotate90
-
-        "rotate180" ->
-            Decode.succeed Rotate180
-
-        "rotate270" ->
-            Decode.succeed Rotate270
-
-        "invert-colors" ->
-            Decode.succeed InvertColors
-
-        "save" ->
-            Decode.succeed Save
-
-        _ ->
+        Nothing ->
             Decode.fail ("unrecognized cmd : " ++ str)
 
 
