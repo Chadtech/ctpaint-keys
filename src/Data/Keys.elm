@@ -594,7 +594,7 @@ toCmd str =
         "init-replace-color" ->
             Decode.succeed InitReplaceColor
 
-        "init-reszie" ->
+        "init-resize" ->
             Decode.succeed InitResize
 
         "toggle-color-picker" ->
