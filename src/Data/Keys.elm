@@ -649,7 +649,7 @@ toCmd str =
             Decode.succeed cmd
 
         Nothing ->
-            Decode.fail ("unrecognized cmd : " ++ str)
+            Decode.fail ("unrecognized cmd -> " ++ str)
 
 
 cmdKeyStateDecoder : Decoder CmdKeyState
