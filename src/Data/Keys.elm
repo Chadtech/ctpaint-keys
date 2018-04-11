@@ -52,7 +52,7 @@ import Json.Decode.Pipeline
 import Json.Encode as Encode exposing (Value)
 import Keyboard exposing (KeyCode)
 import Keyboard.Extra.Browser exposing (Browser, Key(..))
-import String.Extra
+import Regex exposing (HowMany(..), escape, regex)
 import Tuple.Infix exposing ((:=))
 
 
@@ -433,8 +433,23 @@ simpleEncode =
 
 
 dasherize : String -> String
-dasherize =
-    String.Extra.dasherize >> String.dropLeft 1
+dasherize string =
+    string
+        |> String.trim
+        |> Regex.replace All r0 (.match >> String.append "-")
+        |> Regex.replace All r1 (always "-")
+        |> String.toLower
+        |> String.dropLeft 1
+
+
+r0 : Regex
+r0 =
+    regex "([A-Z])"
+
+
+r1 : Regex
+r1 =
+    regex "[_-\\s]+"
 
 
 
