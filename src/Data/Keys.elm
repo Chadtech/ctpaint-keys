@@ -52,7 +52,7 @@ import Json.Decode.Pipeline
 import Json.Encode as Encode exposing (Value)
 import Keyboard exposing (KeyCode)
 import Keyboard.Extra.Browser exposing (Browser, Key(..))
-import Regex exposing (HowMany(..), escape, regex)
+import Regex exposing (HowMany(..), Regex, escape, regex)
 import Tuple.Infix exposing ((:=))
 
 
